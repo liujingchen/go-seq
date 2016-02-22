@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createExampleModel() *HmmModel {
+func createExampleModelForward() *HmmModel {
 	// Example in http://www.cnblogs.com/tornadomeet/archive/2012/03/24/2415583.html
 	model, _ := NewHmmModel([]string{"S1", "S2", "S3"}, []string{"A", "B"})
 	model.StartProbability["S1"] = 1.0
@@ -25,21 +25,21 @@ func createExampleModel() *HmmModel {
 }
 
 func TestForward(t *testing.T) {
-	model := createExampleModel()
+	model := createExampleModelForward()
 	result, err := GetProbabilityOfObservation(model, []string{"A", "B", "A", "B"})
 	require.NoError(t, err)
 	require.InDelta(t, 0.0717696, result, 0.000000001)
 }
 
 func TestForwardLenOne(t *testing.T) {
-	model := createExampleModel()
+	model := createExampleModelForward()
 	result, err := GetProbabilityOfObservation(model, []string{"A"})
 	require.NoError(t, err)
 	require.InDelta(t, 0.7, result, 0.000000001)
 }
 
 func TestForwardError(t *testing.T) {
-	model := createExampleModel()
+	model := createExampleModelForward()
 	_, err := GetProbabilityOfObservation(model, []string{})
 	require.Error(t, err)
 }
