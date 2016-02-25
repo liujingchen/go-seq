@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createExampleModelForward() *HmmModel {
+func createExampleModelEvaluate() *HmmModel {
 	// Example in http://www.cnblogs.com/tornadomeet/archive/2012/03/24/2415583.html
 	model, _ := NewHmmModel([]string{"S1", "S2", "S3"}, []string{"A", "B"})
 	model.StartProbability["S1"] = 1.0
@@ -24,22 +24,22 @@ func createExampleModelForward() *HmmModel {
 	return model
 }
 
-func TestForward(t *testing.T) {
-	model := createExampleModelForward()
-	result, err := GetProbabilityOfObservation(model, []string{"A", "B", "A", "B"})
+func TestEvaluate(t *testing.T) {
+	model := createExampleModelEvaluate()
+	result, err := Evaluate(model, []string{"A", "B", "A", "B"})
 	require.NoError(t, err)
 	require.InDelta(t, 0.0717696, result, 0.000000001)
 }
 
-func TestForwardLenOne(t *testing.T) {
-	model := createExampleModelForward()
-	result, err := GetProbabilityOfObservation(model, []string{"A"})
+func TestEvaluateLenOne(t *testing.T) {
+	model := createExampleModelEvaluate()
+	result, err := Evaluate(model, []string{"A"})
 	require.NoError(t, err)
 	require.InDelta(t, 0.7, result, 0.000000001)
 }
 
-func TestForwardError(t *testing.T) {
-	model := createExampleModelForward()
-	_, err := GetProbabilityOfObservation(model, []string{})
+func TestEvaluateError(t *testing.T) {
+	model := createExampleModelEvaluate()
+	_, err := Evaluate(model, []string{})
 	require.Error(t, err)
 }

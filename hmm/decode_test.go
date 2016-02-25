@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createExampleModelViterbi() *HmmModel {
+func createExampleModelDecode() *HmmModel {
 	// Example from https://en.wikipedia.org/wiki/Viterbi_algorithm#Example
 	model, _ := NewHmmModel([]string{"Healthy", "Fever"}, []string{"normal", "cold", "dizzy"})
 	model.StartProbability["Healthy"] = 0.6
@@ -24,26 +24,26 @@ func createExampleModelViterbi() *HmmModel {
 	return model
 }
 
-func TestViterbi(t *testing.T) {
-	model := createExampleModelViterbi()
-	states, err := GetMostLikelyStates(model, []string{"normal", "cold", "dizzy"})
+func TestDecode(t *testing.T) {
+	model := createExampleModelDecode()
+	states, err := Decode(model, []string{"normal", "cold", "dizzy"})
 	require.NoError(t, err)
 	require.Equal(t, []string{"Healthy", "Healthy", "Fever"}, states)
 }
 
-func TestViterbiLenghOne(t *testing.T) {
-	model := createExampleModelViterbi()
-	states, err := GetMostLikelyStates(model, []string{"normal"})
+func TestDecodeLenghOne(t *testing.T) {
+	model := createExampleModelDecode()
+	states, err := Decode(model, []string{"normal"})
 	require.NoError(t, err)
 	require.Equal(t, []string{"Healthy"}, states)
 }
 
-func TestViterbiError(t *testing.T) {
-	_, err := GetMostLikelyStates(nil, []string{"normal", "cold", "dizzy"})
+func TestDecodeError(t *testing.T) {
+	_, err := Decode(nil, []string{"normal", "cold", "dizzy"})
 	require.Error(t, err)
-	model := createExampleModelViterbi()
-	_, err = GetMostLikelyStates(model, nil)
+	model := createExampleModelDecode()
+	_, err = Decode(model, nil)
 	require.Error(t, err)
-	_, err = GetMostLikelyStates(model, []string{})
+	_, err = Decode(model, []string{})
 	require.Error(t, err)
 }
