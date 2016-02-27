@@ -1,6 +1,9 @@
 package hmm
 
-import "math"
+import (
+	"log"
+	"math"
+)
 
 type updatedHmmModel struct {
 	StartProbability      []float64
@@ -112,15 +115,15 @@ func forwardBackward(model *HmmModel, observations []string, labels []string) *u
 			}
 		}
 
-		for t, labelState := range labels {
-			if _, ok := updatedModel.EmissionNumerator[i][labelState]; !ok {
-				updatedModel.EmissionNumerator[i][labelState] = 0.0
+		for t, observation := range observations {
+			if _, ok := updatedModel.EmissionNumerator[i][observation]; !ok {
+				updatedModel.EmissionNumerator[i][observation] = 0.0
 			}
-			updatedModel.EmissionNumerator[i][labelState] += statePerTime[t][i]
+			updatedModel.EmissionNumerator[i][observation] += statePerTime[t][i]
 		}
 
 		updatedModel.TransitionDenominator[i] = 0.0
-		for t := 0; t < lastIndex; i++ {
+		for t := 0; t < lastIndex; t++ {
 			updatedModel.TransitionDenominator[i] += statePerTime[t][i]
 		}
 		updatedModel.EmissionDenominator[i] = updatedModel.TransitionDenominator[i] + statePerTime[lastIndex][i]
@@ -170,6 +173,7 @@ func Train(trainningData, labels [][]string, gamma float64) (*HmmModel, error) {
 	for i := 0; i < len(trainningData); i++ {
 		<-confirm
 	}
+	iterNum := 0
 	for {
 		sumUpdatedModel := newUpdatedHmmModel(len(model.States), observations)
 		updates := make(chan *updatedHmmModel)
@@ -188,7 +192,7 @@ func Train(trainningData, labels [][]string, gamma float64) (*HmmModel, error) {
 			go func(i int) {
 				preEval := currentEvaluation[i]
 				currentEvaluation[i], _ = Evaluate(nextModel, trainningData[i])
-				deltas <- math.Abs(preEval - currentEvaluation[i])
+				deltas <- math.Abs((preEval - currentEvaluation[i]) / currentEvaluation[i])
 			}(i)
 		}
 		delta := 0.0
@@ -196,6 +200,8 @@ func Train(trainningData, labels [][]string, gamma float64) (*HmmModel, error) {
 			delta += <-deltas
 		}
 		delta /= float64(len(trainningData))
+		iterNum++
+		log.Printf("Iteration %d, delta=%f", iterNum, delta)
 		if delta < gamma {
 			break
 		}

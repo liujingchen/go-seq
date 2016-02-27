@@ -1,6 +1,9 @@
 package hmm
 
-import "errors"
+import (
+	"errors"
+	"math/rand"
+)
 
 type HmmModel struct {
 	States                []string
@@ -11,17 +14,27 @@ type HmmModel struct {
 }
 
 func (m *HmmModel) initialize() {
-	initTransition := 1.0 / float64(len(m.States))
-	initEmission := 1.0 / float64(len(m.Observations))
+	m.StartProbability = randomFloats(len(m.States))
 	for i, _ := range m.States {
-		m.StartProbability[i] = initTransition
-		for j, _ := range m.States {
-			m.TransitionProbability[i][j] = initTransition
-		}
-		for _, observation := range m.Observations {
-			m.EmissionProbability[i][observation] = initEmission
+		m.TransitionProbability[i] = randomFloats(len(m.States))
+		randEmissions := randomFloats(len(m.Observations))
+		for j, observation := range m.Observations {
+			m.EmissionProbability[i][observation] = randEmissions[j]
 		}
 	}
+}
+
+func randomFloats(num int) []float64 {
+	values := make([]float64, num)
+	total := 0.0
+	for i := 0; i < num; i++ {
+		values[i] = rand.Float64()
+		total += values[i]
+	}
+	for i := 0; i < num; i++ {
+		values[i] /= total
+	}
+	return values
 }
 
 func newHmmModel(states, observations []string) (*HmmModel, error) {

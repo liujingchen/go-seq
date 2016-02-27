@@ -15,16 +15,6 @@ func TestNewHmmModel(t *testing.T) {
 	require.NotNil(t, model.TransitionProbability[1])
 	require.NotNil(t, model.EmissionProbability[0])
 	require.NotNil(t, model.EmissionProbability[1])
-
-	model.initialize()
-	require.InDelta(t, 0.5, model.TransitionProbability[0][0], 0.00001)
-	require.InDelta(t, 0.5, model.TransitionProbability[0][1], 0.00001)
-	require.InDelta(t, 0.5, model.TransitionProbability[1][0], 0.00001)
-	require.InDelta(t, 0.5, model.TransitionProbability[1][1], 0.00001)
-	require.InDelta(t, 0.5, model.EmissionProbability[0]["A"], 0.00001)
-	require.InDelta(t, 0.5, model.EmissionProbability[0]["B"], 0.00001)
-	require.InDelta(t, 0.5, model.EmissionProbability[1]["A"], 0.00001)
-	require.InDelta(t, 0.5, model.EmissionProbability[1]["B"], 0.00001)
 }
 
 func TestNewHmmModelError(t *testing.T) {
