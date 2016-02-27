@@ -10,7 +10,21 @@ type HmmModel struct {
 	EmissionProbability   []map[string]float64
 }
 
-func NewHmmModel(states, observations []string) (*HmmModel, error) {
+func (m *HmmModel) initialize() {
+	initTransition := 1.0 / float64(len(m.States))
+	initEmission := 1.0 / float64(len(m.Observations))
+	for i, _ := range m.States {
+		m.StartProbability[i] = initTransition
+		for j, _ := range m.States {
+			m.TransitionProbability[i][j] = initTransition
+		}
+		for _, observation := range m.Observations {
+			m.EmissionProbability[i][observation] = initEmission
+		}
+	}
+}
+
+func newHmmModel(states, observations []string) (*HmmModel, error) {
 	if states == nil || observations == nil || len(states) <= 1 || len(observations) <= 1 {
 		return nil, errors.New("States and observations must have more than 1 elements.")
 	}

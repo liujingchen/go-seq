@@ -1,5 +1,7 @@
 package hmm
 
+import "math"
+
 type updatedHmmModel struct {
 	StartProbability      []float64
 	TransitionNumerator   [][]float64
@@ -20,6 +22,45 @@ func newUpdatedHmmModel(stateNum int, observations []string) *updatedHmmModel {
 	model.EmissionDenominator = make([]float64, stateNum)
 	for i := 0; i < stateNum; i++ {
 		model.EmissionNumerator[i] = make(map[string]float64)
+	}
+	return model
+}
+
+func (m *updatedHmmModel) add(otherModel *updatedHmmModel) {
+	for i, _ := range m.StartProbability {
+		m.StartProbability[i] += otherModel.StartProbability[i]
+		m.TransitionDenominator[i] += otherModel.TransitionDenominator[i]
+		m.EmissionDenominator[i] += otherModel.EmissionDenominator[i]
+		for j, _ := range m.StartProbability {
+			m.TransitionNumerator[i][j] += otherModel.TransitionNumerator[i][j]
+		}
+		for observation, p := range otherModel.EmissionNumerator[i] {
+			if _, ok := m.EmissionNumerator[i][observation]; !ok {
+				m.EmissionNumerator[i][observation] = 0.0
+			}
+			m.EmissionNumerator[i][observation] += p
+		}
+	}
+}
+
+func (m *updatedHmmModel) toHmmModel(oldModel *HmmModel) *HmmModel {
+	model, _ := newHmmModel(oldModel.States, oldModel.Observations)
+	total := 0.0
+	for i, _ := range model.States {
+		total += m.StartProbability[i]
+	}
+	for i, _ := range model.States {
+		model.StartProbability[i] = m.StartProbability[i] / total
+	}
+	for i, _ := range model.States {
+		for j, _ := range model.States {
+			model.TransitionProbability[i][j] = m.TransitionNumerator[i][j] / m.TransitionDenominator[i]
+		}
+	}
+	for i, _ := range model.States {
+		for observation, p := range m.EmissionNumerator[i] {
+			model.EmissionProbability[i][observation] = p / m.EmissionDenominator[i]
+		}
 	}
 	return model
 }
@@ -108,4 +149,75 @@ func backward(model *HmmModel, observations []string) [][]float64 {
 	}
 
 	return backwardMatrix
+}
+
+func Train(trainningData, labels [][]string, gamma float64) (*HmmModel, error) {
+	states := getAllTokens(labels)
+	observations := getAllTokens(trainningData)
+	model, err := newHmmModel(states, observations)
+	if err != nil {
+		return nil, err
+	}
+	model.initialize()
+	currentEvaluation := make([]float64, len(trainningData))
+	confirm := make(chan bool)
+	for i, _ := range trainningData {
+		go func(i int) {
+			currentEvaluation[i], _ = Evaluate(model, trainningData[i])
+			confirm <- true
+		}(i)
+	}
+	for i := 0; i < len(trainningData); i++ {
+		<-confirm
+	}
+	for {
+		sumUpdatedModel := newUpdatedHmmModel(len(model.States), observations)
+		updates := make(chan *updatedHmmModel)
+		for i, _ := range trainningData {
+			go func(i int) {
+				updates <- forwardBackward(model, trainningData[i], labels[i])
+			}(i)
+		}
+		for i := 0; i < len(trainningData); i++ {
+			updatedModel := <-updates
+			sumUpdatedModel.add(updatedModel)
+		}
+		nextModel := sumUpdatedModel.toHmmModel(model)
+		deltas := make(chan float64)
+		for i, _ := range trainningData {
+			go func(i int) {
+				preEval := currentEvaluation[i]
+				currentEvaluation[i], _ = Evaluate(nextModel, trainningData[i])
+				deltas <- math.Abs(preEval - currentEvaluation[i])
+			}(i)
+		}
+		delta := 0.0
+		for i := 0; i < len(trainningData); i++ {
+			delta += <-deltas
+		}
+		delta /= float64(len(trainningData))
+		if delta < gamma {
+			break
+		}
+		model = nextModel
+	}
+	return model, nil
+}
+
+func getAllTokens(data [][]string) []string {
+	tokenMap := make(map[string]int)
+	index := 0
+	for _, tokenList := range data {
+		for _, token := range tokenList {
+			if _, ok := tokenMap[token]; !ok {
+				tokenMap[token] = index
+				index++
+			}
+		}
+	}
+	tokenList := make([]string, index)
+	for token, index := range tokenMap {
+		tokenList[index] = token
+	}
+	return tokenList
 }

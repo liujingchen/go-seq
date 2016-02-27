@@ -8,7 +8,7 @@ import (
 
 func createExampleModelDecode() *HmmModel {
 	// Example from https://en.wikipedia.org/wiki/Viterbi_algorithm#Example
-	model, _ := NewHmmModel([]string{"Healthy", "Fever"}, []string{"normal", "cold", "dizzy"})
+	model, _ := newHmmModel([]string{"Healthy", "Fever"}, []string{"normal", "cold", "dizzy"})
 	model.StartProbability[0] = 0.6
 	model.StartProbability[1] = 0.4
 	model.TransitionProbability[0][0] = 0.7

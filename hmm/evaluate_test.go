@@ -8,7 +8,7 @@ import (
 
 func createExampleModelEvaluate() *HmmModel {
 	// Example in http://www.cnblogs.com/tornadomeet/archive/2012/03/24/2415583.html
-	model, _ := NewHmmModel([]string{"S1", "S2", "S3"}, []string{"A", "B"})
+	model, _ := newHmmModel([]string{"S1", "S2", "S3"}, []string{"A", "B"})
 	model.StartProbability[0] = 1.0
 	model.TransitionProbability[0][0] = 0.4
 	model.TransitionProbability[0][1] = 0.6

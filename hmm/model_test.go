@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewHmmModel(t *testing.T) {
-	model, err := NewHmmModel([]string{"S1", "S2"}, []string{"A", "B"})
+	model, err := newHmmModel([]string{"S1", "S2"}, []string{"A", "B"})
 	require.NoError(t, err)
 	require.Equal(t, []string{"S1", "S2"}, model.States)
 	require.Equal(t, []string{"A", "B"}, model.Observations)
@@ -15,15 +15,25 @@ func TestNewHmmModel(t *testing.T) {
 	require.NotNil(t, model.TransitionProbability[1])
 	require.NotNil(t, model.EmissionProbability[0])
 	require.NotNil(t, model.EmissionProbability[1])
+
+	model.initialize()
+	require.InDelta(t, 0.5, model.TransitionProbability[0][0], 0.00001)
+	require.InDelta(t, 0.5, model.TransitionProbability[0][1], 0.00001)
+	require.InDelta(t, 0.5, model.TransitionProbability[1][0], 0.00001)
+	require.InDelta(t, 0.5, model.TransitionProbability[1][1], 0.00001)
+	require.InDelta(t, 0.5, model.EmissionProbability[0]["A"], 0.00001)
+	require.InDelta(t, 0.5, model.EmissionProbability[0]["B"], 0.00001)
+	require.InDelta(t, 0.5, model.EmissionProbability[1]["A"], 0.00001)
+	require.InDelta(t, 0.5, model.EmissionProbability[1]["B"], 0.00001)
 }
 
 func TestNewHmmModelError(t *testing.T) {
-	_, err := NewHmmModel(nil, []string{"A", "B"})
+	_, err := newHmmModel(nil, []string{"A", "B"})
 	require.Error(t, err)
-	_, err = NewHmmModel([]string{"S1", "S2"}, nil)
+	_, err = newHmmModel([]string{"S1", "S2"}, nil)
 	require.Error(t, err)
-	_, err = NewHmmModel([]string{"S1"}, []string{"A", "B"})
+	_, err = newHmmModel([]string{"S1"}, []string{"A", "B"})
 	require.Error(t, err)
-	_, err = NewHmmModel([]string{"S1", "S2"}, []string{"A"})
+	_, err = newHmmModel([]string{"S1", "S2"}, []string{"A"})
 	require.Error(t, err)
 }
