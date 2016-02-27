@@ -9,18 +9,18 @@ import (
 func createExampleModelEvaluate() *HmmModel {
 	// Example in http://www.cnblogs.com/tornadomeet/archive/2012/03/24/2415583.html
 	model, _ := NewHmmModel([]string{"S1", "S2", "S3"}, []string{"A", "B"})
-	model.StartProbability["S1"] = 1.0
-	model.TransitionProbability["S1"]["S1"] = 0.4
-	model.TransitionProbability["S1"]["S2"] = 0.6
-	model.TransitionProbability["S2"]["S2"] = 0.8
-	model.TransitionProbability["S2"]["S3"] = 0.2
-	model.TransitionProbability["S3"]["S3"] = 1.0
-	model.EmissionProbability["S1"]["A"] = 0.7
-	model.EmissionProbability["S1"]["B"] = 0.3
-	model.EmissionProbability["S2"]["A"] = 0.4
-	model.EmissionProbability["S2"]["B"] = 0.6
-	model.EmissionProbability["S3"]["A"] = 0.8
-	model.EmissionProbability["S3"]["B"] = 0.2
+	model.StartProbability[0] = 1.0
+	model.TransitionProbability[0][0] = 0.4
+	model.TransitionProbability[0][1] = 0.6
+	model.TransitionProbability[1][1] = 0.8
+	model.TransitionProbability[1][2] = 0.2
+	model.TransitionProbability[2][2] = 1.0
+	model.EmissionProbability[0]["A"] = 0.7
+	model.EmissionProbability[0]["B"] = 0.3
+	model.EmissionProbability[1]["A"] = 0.4
+	model.EmissionProbability[1]["B"] = 0.6
+	model.EmissionProbability[2]["A"] = 0.8
+	model.EmissionProbability[2]["B"] = 0.2
 	return model
 }
 

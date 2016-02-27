@@ -11,10 +11,10 @@ func TestNewHmmModel(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, []string{"S1", "S2"}, model.States)
 	require.Equal(t, []string{"A", "B"}, model.Observations)
-	require.NotNil(t, model.TransitionProbability["S1"])
-	require.NotNil(t, model.TransitionProbability["S2"])
-	require.NotNil(t, model.EmissionProbability["S1"])
-	require.NotNil(t, model.EmissionProbability["S2"])
+	require.NotNil(t, model.TransitionProbability[0])
+	require.NotNil(t, model.TransitionProbability[1])
+	require.NotNil(t, model.EmissionProbability[0])
+	require.NotNil(t, model.EmissionProbability[1])
 }
 
 func TestNewHmmModelError(t *testing.T) {

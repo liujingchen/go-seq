@@ -25,19 +25,19 @@ func viterbi(model *HmmModel, observations []string) [][]float64 {
 	for i, _ := range viterbiMatrix {
 		viterbiMatrix[i] = make([]float64, len(model.States))
 	}
-	for i, state := range model.States {
-		viterbiMatrix[0][i] = model.StartProbability[state] * model.EmissionProbability[state][observations[0]]
+	for i, _ := range model.States {
+		viterbiMatrix[0][i] = model.StartProbability[i] * model.EmissionProbability[i][observations[0]]
 	}
 	for i := 1; i < len(observations); i++ {
-		for j, state := range model.States {
+		for j, _ := range model.States {
 			maxProbability := 0.0
-			for preJ, preState := range model.States {
-				probability := viterbiMatrix[i-1][preJ] * model.TransitionProbability[preState][state]
+			for preJ, _ := range model.States {
+				probability := viterbiMatrix[i-1][preJ] * model.TransitionProbability[preJ][j]
 				if maxProbability < probability {
 					maxProbability = probability
 				}
 			}
-			viterbiMatrix[i][j] = maxProbability * model.EmissionProbability[state][observations[i]]
+			viterbiMatrix[i][j] = maxProbability * model.EmissionProbability[j][observations[i]]
 		}
 	}
 	return viterbiMatrix

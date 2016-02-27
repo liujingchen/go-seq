@@ -5,9 +5,9 @@ import "errors"
 type HmmModel struct {
 	States                []string
 	Observations          []string
-	StartProbability      map[string]float64
-	TransitionProbability map[string]map[string]float64
-	EmissionProbability   map[string]map[string]float64
+	StartProbability      []float64
+	TransitionProbability [][]float64
+	EmissionProbability   []map[string]float64
 }
 
 func NewHmmModel(states, observations []string) (*HmmModel, error) {
@@ -15,14 +15,14 @@ func NewHmmModel(states, observations []string) (*HmmModel, error) {
 		return nil, errors.New("States and observations must have more than 1 elements.")
 	}
 	model := &HmmModel{States: states, Observations: observations}
-	model.StartProbability = make(map[string]float64)
-	model.TransitionProbability = make(map[string]map[string]float64)
-	for _, stateFrom := range states {
-		model.TransitionProbability[stateFrom] = make(map[string]float64)
+	model.StartProbability = make([]float64, len(states))
+	model.TransitionProbability = make([][]float64, len(states))
+	for i, _ := range states {
+		model.TransitionProbability[i] = make([]float64, len(states))
 	}
-	model.EmissionProbability = make(map[string]map[string]float64)
-	for _, state := range states {
-		model.EmissionProbability[state] = make(map[string]float64)
+	model.EmissionProbability = make([]map[string]float64, len(states))
+	for i, _ := range states {
+		model.EmissionProbability[i] = make(map[string]float64)
 	}
 	return model, nil
 }

@@ -44,11 +44,11 @@ func forwardBackward(model *HmmModel, observations []string, labels []string) *u
 	for t := 0; t < len(observations); t++ {
 		transitionPerTime[t] = make([][]float64, len(model.States))
 		total := 0.0
-		for i, stateI := range model.States {
+		for i, _ := range model.States {
 			transitionPerTime[t][i] = make([]float64, len(model.States))
-			for j, stateJ := range model.States {
-				transitionPerTime[t][i][j] = forwardMatrix[t][i] * model.TransitionProbability[stateI][stateJ] *
-					model.EmissionProbability[stateJ][observations[t]] * backwardMatrix[t][j]
+			for j, _ := range model.States {
+				transitionPerTime[t][i][j] = forwardMatrix[t][i] * model.TransitionProbability[i][j] *
+					model.EmissionProbability[j][observations[t]] * backwardMatrix[t][j]
 				total += transitionPerTime[t][i][j]
 			}
 		}
@@ -98,11 +98,11 @@ func backward(model *HmmModel, observations []string) [][]float64 {
 	}
 
 	for i := lastIndex - 1; i >= 0; i-- {
-		for j, state := range model.States {
+		for j, _ := range model.States {
 			backwardMatrix[i][j] = 0.0
-			for nextJ, nextState := range model.States {
-				backwardMatrix[i][j] += model.TransitionProbability[state][nextState] * backwardMatrix[i+1][nextJ] *
-					model.EmissionProbability[nextState][observations[i+1]]
+			for nextJ, _ := range model.States {
+				backwardMatrix[i][j] += model.TransitionProbability[j][nextJ] * backwardMatrix[i+1][nextJ] *
+					model.EmissionProbability[nextJ][observations[i+1]]
 			}
 		}
 	}

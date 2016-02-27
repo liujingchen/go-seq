@@ -9,18 +9,18 @@ import (
 func createExampleModelDecode() *HmmModel {
 	// Example from https://en.wikipedia.org/wiki/Viterbi_algorithm#Example
 	model, _ := NewHmmModel([]string{"Healthy", "Fever"}, []string{"normal", "cold", "dizzy"})
-	model.StartProbability["Healthy"] = 0.6
-	model.StartProbability["Fever"] = 0.4
-	model.TransitionProbability["Healthy"]["Healthy"] = 0.7
-	model.TransitionProbability["Healthy"]["Fever"] = 0.3
-	model.TransitionProbability["Fever"]["Healthy"] = 0.4
-	model.TransitionProbability["Fever"]["Fever"] = 0.6
-	model.EmissionProbability["Healthy"]["normal"] = 0.5
-	model.EmissionProbability["Healthy"]["cold"] = 0.4
-	model.EmissionProbability["Healthy"]["dizzy"] = 0.1
-	model.EmissionProbability["Fever"]["normal"] = 0.1
-	model.EmissionProbability["Fever"]["cold"] = 0.3
-	model.EmissionProbability["Fever"]["dizzy"] = 0.6
+	model.StartProbability[0] = 0.6
+	model.StartProbability[1] = 0.4
+	model.TransitionProbability[0][0] = 0.7
+	model.TransitionProbability[0][1] = 0.3
+	model.TransitionProbability[1][0] = 0.4
+	model.TransitionProbability[1][1] = 0.6
+	model.EmissionProbability[0]["normal"] = 0.5
+	model.EmissionProbability[0]["cold"] = 0.4
+	model.EmissionProbability[0]["dizzy"] = 0.1
+	model.EmissionProbability[1]["normal"] = 0.1
+	model.EmissionProbability[1]["cold"] = 0.3
+	model.EmissionProbability[1]["dizzy"] = 0.6
 	return model
 }
 

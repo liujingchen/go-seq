@@ -21,17 +21,17 @@ func forward(model *HmmModel, observations []string) [][]float64 {
 		forwardMatrix[i] = make([]float64, len(model.States))
 	}
 
-	for i, state := range model.States {
-		forwardMatrix[0][i] = model.StartProbability[state] * model.EmissionProbability[state][observations[0]]
+	for i, _ := range model.States {
+		forwardMatrix[0][i] = model.StartProbability[i] * model.EmissionProbability[i][observations[0]]
 	}
 
 	for i := 1; i < len(observations); i++ {
-		for j, state := range model.States {
+		for j, _ := range model.States {
 			transitionPro := 0.0
-			for k, preState := range model.States {
-				transitionPro += forwardMatrix[i-1][k] * model.TransitionProbability[preState][state]
+			for k, _ := range model.States {
+				transitionPro += forwardMatrix[i-1][k] * model.TransitionProbability[k][j]
 			}
-			forwardMatrix[i][j] = transitionPro * model.EmissionProbability[state][observations[i]]
+			forwardMatrix[i][j] = transitionPro * model.EmissionProbability[j][observations[i]]
 		}
 	}
 	return forwardMatrix
